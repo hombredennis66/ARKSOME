@@ -6,11 +6,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/** Coins are internal platform points, never cash. Always format as AC. */
+/** Format simulated USD balances stored as integer cents. */
 export function formatCoins(amount: number) {
-  return `${new Intl.NumberFormat("en-US").format(amount)} AC`;
+  return `${new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount / 100)} TEST`;
 }
-
 export function formatNumber(value: number) {
   return new Intl.NumberFormat("en-US").format(value);
 }

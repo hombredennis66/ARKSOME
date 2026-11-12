@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
-import { COIN_DISCLAIMER } from "@/lib/constants";
 import { cn, formatCoins, formatDate, formatNumber, formatRelativeTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -53,27 +52,33 @@ export default async function WalletPage({
       <div>
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Wallet</h1>
         <p className="mt-1 text-muted-foreground">
-          Your balance and the full, permanent history of every AC movement.
+          Your simulated USD balance and complete transaction history.
         </p>
       </div>
 
       {/* Balance + disclaimer */}
       <section aria-labelledby="balance-heading" className="rounded-2xl border border-border bg-card p-6">
         <p id="balance-heading" className="text-sm font-medium text-muted-foreground">
-          Current balance
+          Current simulated USD balance
         </p>
         <p className="mt-2 text-4xl font-bold text-coin">{formatCoins(user.balance)}</p>
         <p className="mt-4 max-w-3xl rounded-lg bg-muted p-3 text-xs leading-relaxed text-muted-foreground">
-          {COIN_DISCLAIMER}
+          TEST LEDGER: All displayed USD balances are simulated values for development
+          and testing. They are not actual funds and cannot be withdrawn or transferred.
         </p>
       </section>
 
       {/* Ledger */}
       <section aria-labelledby="history-heading">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h2 id="history-heading" className="text-lg font-semibold">
-            Transaction history
-          </h2>
+          <div>
+            <h2 id="history-heading" className="text-lg font-semibold">
+              Transaction history
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Your balance and the full, permanent history of every USD ledger movement.
+            </p>
+          </div>
           <p className="text-sm text-muted-foreground">
             {total > 0
               ? `${formatNumber(total)} transaction${total === 1 ? "" : "s"}`
@@ -85,7 +90,7 @@ export default async function WalletPage({
           <div className="rounded-xl border border-border bg-card p-8 text-center">
             <p className="font-medium">No transactions yet</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Complete an activity and your first AC credit will appear here.
+              Complete an eligible test activity to see your first simulated USD credit here.
             </p>
             <Link
               href="/activities"

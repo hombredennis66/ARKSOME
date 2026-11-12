@@ -917,3 +917,5 @@ export const Constants = {
     },
   },
 } as const
+export type CoinTransaction =
+  Database["public"]["Tables"]["coin_transactions"]["Row"];
