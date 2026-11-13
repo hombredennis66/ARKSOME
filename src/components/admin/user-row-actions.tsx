@@ -84,20 +84,22 @@ export function UserRowActions({
       </Button>
 
       <details className="rounded-md border border-border bg-muted/50 px-3 py-2">
-        <summary className="cursor-pointer text-xs font-medium">Adjust balance (AC)</summary>
+        <summary className="cursor-pointer text-xs font-medium">
+          Adjust simulated USD balance
+        </summary>
         <form onSubmit={handleBalanceAdjust} className="mt-2 space-y-2">
           <div className="grid grid-cols-2 gap-2">
             <div>
               <Label htmlFor={`amount-${userId}`} className="text-xs text-muted-foreground">
-                Amount (±AC)
+                Amount (USD)
               </Label>
               <Input
                 id={`amount-${userId}`}
                 name="amount"
                 type="number"
-                step={1}
+                step="0.01"
                 required
-                placeholder="-50"
+                placeholder="-0.50"
                 className="mt-1 h-8 text-xs"
                 disabled={pending}
               />

@@ -87,6 +87,7 @@ const SERVICE_KEY_MISSING =
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const KEY_RE = /^[a-z0-9][a-z0-9_-]{1,59}$/;
 const MAX_COINS = 1_000_000;
+const MAX_WALLET_ADJUSTMENT_CENTS = 1_000_000;
 
 function fail(error: string): AdminActionResult {
   return { ok: false, error };
@@ -196,8 +197,18 @@ export async function adminAdjustBalance(
 ): Promise<AdminActionResult> {
   await requireAdmin();
   if (!isUuid(userId)) return fail("Invalid user id.");
-  if (!Number.isInteger(amount) || amount === 0 || Math.abs(amount) > MAX_COINS) {
-    return fail(`Amount must be a whole, non-zero number of AC within ±${MAX_COINS.toLocaleString()}.`);
+  if (!Number.isFinite(amount)) {
+    return fail("Enter a valid USD amount.");
+  }
+
+  const amountCents = Math.round(amount * 100);
+
+  if (
+    Math.abs(amount * 100 - amountCents) > 0.000001 ||
+    amountCents === 0 ||
+    Math.abs(amountCents) > MAX_WALLET_ADJUSTMENT_CENTS
+  ) {
+    return fail("Enter a non-zero amount with up to 2 decimal places, within ±$10,000.00.");
   }
   const trimmedReason = (reason ?? "").trim();
   if (trimmedReason.length < 3 || trimmedReason.length > 200) {
@@ -209,7 +220,7 @@ export async function adminAdjustBalance(
 
   const { data, error } = await supabase.rpc("admin_adjust_balance", {
     p_user_id: userId,
-    p_amount: amount,
+    p_amount: amountCents,
     p_reason: trimmedReason,
   });
   if (error) return fail(error.message);
@@ -218,16 +229,16 @@ export async function adminAdjustBalance(
   if (!payload?.ok) return fail(payload?.error ?? "Adjustment failed.");
 
   await logAdminAction(supabase, "balance_adjust", "user", userId, {
-    amount,
+    amount: amountCents,
     reason: trimmedReason,
     balance: payload.balance ?? 0,
     actor_note: "logged from admin console",
   });
   revalidatePath("/admin/users");
   revalidatePath("/admin");
-  const direction = amount > 0 ? "credited" : "debited";
+  const direction = amountCents > 0 ? "credited" : "debited";
   return ok(
-    `Account ${direction} ${formatCoins(Math.abs(amount))}. New balance: ${formatCoins(payload.balance ?? 0)}.`,
+    `Account ${direction} ${formatCoins(Math.abs(amountCents))}. New balance: ${formatCoins(payload.balance ?? 0)}.`,
   );
 }
 

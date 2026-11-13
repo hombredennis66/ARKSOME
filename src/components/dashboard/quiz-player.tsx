@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Loader2, Trophy } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { submitQuiz } from "@/lib/actions/rewards";
 import { formatCoins } from "@/lib/utils";
-import type { QuizQuestion } from "@/lib/database.types";
+import { parseQuizQuestions, type QuizQuestion } from "@/lib/database.types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -96,13 +96,17 @@ export function QuizPlayer({
         setPhase("idle");
         return;
       }
-      if (!data.questions || data.questions.length === 0) {
-        setFeedback({ kind: "error", text: "This quiz has no questions yet." });
+      const questions = parseQuizQuestions(data.questions);
+
+      if (questions.length === 0) {
+        setFeedback({ kind: "error", text: "This quiz has no valid questions yet." });
         setPhase("idle");
         return;
       }
-      setQuiz(data);
-      setAnswers(new Array<number | null>(data.questions.length).fill(null));
+
+      const quizData: QuizRow = { ...data, questions };
+      setQuiz(quizData);
+      setAnswers(new Array<number | null>(questions.length).fill(null));
       setCurrent(0);
       setResult(null);
       setPhase("playing");

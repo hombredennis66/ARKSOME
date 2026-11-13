@@ -4,7 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { requireAdmin } from "@/lib/auth";
 import { getServiceClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import type { Activity, Quiz } from "@/lib/database.types";
+import { parseQuizQuestions, type Activity, type Quiz } from "@/lib/database.types";
 
 export const dynamic = "force-dynamic";
 
@@ -40,8 +40,11 @@ export default async function AdminActivitiesPage({
     else if (quizzesRes.error) loadError = quizzesRes.error.message;
 
     activities = activitiesRes.data ?? [];
-    quizItems = (quizzesRes.data ?? []).map((quiz) => ({ ...quiz, answersJson: "" }));
-
+       quizItems = (quizzesRes.data ?? []).map((quiz) => ({
+      ...quiz,
+      questions: parseQuizQuestions(quiz.questions),
+      answersJson: "",
+    }));
     // Editing a quiz requires the answer key, which session clients can never
     // read (column-level grant). Load it with the service-role client only
     // when an edit was requested.

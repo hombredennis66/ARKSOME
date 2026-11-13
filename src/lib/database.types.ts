@@ -919,3 +919,43 @@ export const Constants = {
 } as const
 export type CoinTransaction =
   Database["public"]["Tables"]["coin_transactions"]["Row"];
+
+export type Activity = Tables<"activities">;
+export type AdPlacement = Tables<"ad_placements">;
+export type AuditLog = Tables<"audit_logs">;
+export type Campaign = Tables<"campaigns">;
+export type Content = Tables<"content">;
+export type ContentReport = Tables<"content_reports">;
+export type AppNotification = Tables<"notifications">;
+export type Profile = Tables<"profiles">;
+export type Referral = Tables<"referrals">;
+export type RewardConfig = Tables<"reward_configs">;
+
+export type UserRole = Enums<"user_role">;
+export type ContentStatus = Enums<"content_status">;
+export type ContentType = Enums<"content_type">;
+
+export type QuizQuestion = {
+  id: string;
+  question: string;
+  options: string[];
+};
+
+export type Quiz = Omit<Tables<"quizzes">, "questions"> & {
+  questions: QuizQuestion[];
+};
+
+export function parseQuizQuestions(value: Json): QuizQuestion[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.filter(
+    (item): item is { id: string; question: string; options: string[] } =>
+      typeof item === "object" &&
+      item !== null &&
+      !Array.isArray(item) &&
+      typeof item.id === "string" &&
+      typeof item.question === "string" &&
+      Array.isArray(item.options) &&
+      item.options.every((option) => typeof option === "string"),
+  );
+}
