@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
-import { formatCoins } from "@/lib/utils";
+import { formatAC } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { SetupNotice } from "@/components/dashboard/setup-notice";
 import { CheckinCard } from "@/components/dashboard/checkin-card";
@@ -93,11 +93,11 @@ export default async function ActivitiesPage() {
                       <p className="mt-1 text-sm text-muted-foreground">{quiz.description}</p>
                     )}
                     <p className="mt-2 text-xs text-muted-foreground">
-                      {formatCoins(quiz.reward_amount)} reward · {quiz.max_attempts_per_day} attempt
+                      {formatAC(quiz.reward_amount)} reward · {quiz.max_attempts_per_day} attempt
                       {quiz.max_attempts_per_day === 1 ? "" : "s"} per day
                     </p>
                   </div>
-                  <Badge variant="coin">{formatCoins(quiz.reward_amount)}</Badge>
+                  <Badge variant="coin">{formatAC(quiz.reward_amount)}</Badge>
                 </div>
                 <div className="mt-4">
                   <QuizPlayer
@@ -133,7 +133,7 @@ export default async function ActivitiesPage() {
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="text-base font-semibold">{activity.title}</h3>
                   <Badge variant="coin" className="shrink-0">
-                    {activity.reward_amount > 0 ? formatCoins(activity.reward_amount) : "Varies"}
+                    {activity.reward_amount > 0 ? formatAC(activity.reward_amount) : "Varies"}
                   </Badge>
                 </div>
                 {activity.description && (

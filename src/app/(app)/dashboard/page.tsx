@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Bell, Bookmark, Check, Flame, Users, Wallet as WalletIcon, Zap } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
-import { formatCoins, formatDate, formatNumber, formatRelativeTime } from "@/lib/utils";
+import { formatAC, formatCoins, formatDate, formatNumber, formatRelativeTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { SetupNotice } from "@/components/dashboard/setup-notice";
 import type { Activity, CoinTransaction } from "@/lib/database.types";
@@ -93,7 +93,7 @@ export default async function DashboardPage() {
             {checkedInToday ? (
               <Badge variant="success">
                 <Check className="size-3" aria-hidden /> Checked in today
-                {checkinCoins > 0 && <> · {formatCoins(checkinCoins)}</>}
+                {checkinCoins > 0 && <> · {formatAC(checkinCoins)}</>}
               </Badge>
             ) : (
               <Badge variant="warning">Not checked in yet</Badge>
@@ -276,7 +276,7 @@ export default async function DashboardPage() {
                     )}
                   </div>
                   <Badge variant="coin">
-                    {activity.reward_amount > 0 ? formatCoins(activity.reward_amount) : "Varies"}
+                    {activity.reward_amount > 0 ? formatAC(activity.reward_amount) : "Varies"}
                   </Badge>
                   <Link
                     href="/activities"

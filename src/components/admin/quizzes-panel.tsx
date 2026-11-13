@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input, Label, Textarea } from "@/components/ui/input";
 import { adminSaveQuiz, type QuizInput } from "@/lib/actions/admin";
 import type { QuizQuestion } from "@/lib/database.types";
-import { formatCoins } from "@/lib/utils";
+import { formatAC } from "@/lib/utils";
 
 export type AdminQuizItem = {
   id: string;
@@ -147,7 +147,7 @@ export function QuizzesPanel({
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {quiz.questions.length} question{quiz.questions.length === 1 ? "" : "s"} · pays{" "}
-                    {formatCoins(quiz.reward_amount)} per correct answer · {quiz.max_attempts_per_day}{" "}
+                    {formatAC(quiz.reward_amount)} per correct answer · {quiz.max_attempts_per_day}{" "}
                     attempt{quiz.max_attempts_per_day === 1 ? "" : "s"}/day
                   </p>
                 </div>

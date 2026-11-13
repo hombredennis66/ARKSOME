@@ -13,6 +13,12 @@ export function formatCoins(amount: number) {
     currency: "USD",
   }).format(amount / 100)} TEST`;
 }
+
+/** Format legacy ARKSOME Coins (AC), which are not USD. */
+export function formatAC(amount: number) {
+  return `${new Intl.NumberFormat("en-US").format(amount)} AC`;
+}
+
 export function formatNumber(value: number) {
   return new Intl.NumberFormat("en-US").format(value);
 }

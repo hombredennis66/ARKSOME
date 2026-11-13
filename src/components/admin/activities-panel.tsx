@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input, Label, Textarea } from "@/components/ui/input";
 import { adminSaveActivity, adminSetActivityEnabled, type ActivityInput } from "@/lib/actions/admin";
 import type { Activity } from "@/lib/database.types";
-import { formatCoins } from "@/lib/utils";
+import { formatAC } from "@/lib/utils";
 
 const ACTIVITY_TYPES = ["checkin", "quiz", "referral", "read", "ad", "streak"];
 
@@ -113,7 +113,7 @@ export function ActivitiesPanel({ activities, serviceReady }: { activities: Acti
                     </Badge>
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {activity.activity_type} · pays {formatCoins(activity.reward_amount)} · position{" "}
+                    {activity.activity_type} · pays {formatAC(activity.reward_amount)} · position{" "}
                     {activity.position}
                     {activity.description ? ` · ${activity.description}` : ""}
                   </p>

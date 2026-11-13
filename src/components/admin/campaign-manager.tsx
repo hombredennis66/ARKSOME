@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input, Label, Select } from "@/components/ui/input";
 import { adminSaveCampaign, type CampaignInput } from "@/lib/actions/admin";
 import type { Campaign } from "@/lib/database.types";
-import { formatCoins, formatDate } from "@/lib/utils";
+import { formatAC, formatDate } from "@/lib/utils";
 
 const STATUSES: Campaign["status"][] = ["draft", "active", "paused", "ended"];
 
@@ -116,7 +116,7 @@ export function CampaignManager({ campaigns, serviceReady }: { campaigns: Campai
                         {formatDate(campaign.starts_at)} → {formatDate(campaign.ends_at)}
                       </td>
                       <td className="px-4 py-3 font-semibold text-coin">
-                        {campaign.budget_coins === null ? "—" : formatCoins(campaign.budget_coins)}
+                        {campaign.budget_coins === null ? "—" : formatAC(campaign.budget_coins)}
                       </td>
                       <td className="px-4 py-3 text-xs text-muted-foreground">
                         {campaign.impressions.toLocaleString()} impressions ·{" "}

@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { ChevronLeft, ChevronRight, Loader2, Trophy } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { submitQuiz } from "@/lib/actions/rewards";
-import { formatCoins } from "@/lib/utils";
+import { formatAC, formatCoins } from "@/lib/utils";
 import { parseQuizQuestions, type QuizQuestion } from "@/lib/database.types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -159,10 +159,10 @@ export function QuizPlayer({
     return (
       <div className="rounded-lg border border-border bg-muted p-4">
         <p className="text-sm text-muted-foreground">
-          {description ?? `Answer ${title} to earn up to ${formatCoins(rewardAmount)}.`}
+          {description ?? `Answer ${title} to earn up to ${formatAC(rewardAmount)}.`}
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
-          {formatCoins(rewardAmount)} reward · {maxAttempts} attempt
+          {formatAC(rewardAmount)} reward · {maxAttempts} attempt
           {maxAttempts === 1 ? "" : "s"} per day
         </p>
         <Button className="mt-3" variant="default" onClick={startQuiz} disabled={phase === "loading"}>
@@ -185,7 +185,7 @@ export function QuizPlayer({
         <p className="mt-2 text-sm">
           {result.coins > 0 ? (
             <>
-              Earned: <span className="font-semibold text-coin">+{formatCoins(result.coins)}</span>
+              Earned: <span className="font-semibold text-coin">+{formatAC(result.coins)}</span>
             </>
           ) : (
             <span className="text-muted-foreground">

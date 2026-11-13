@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
-import { formatCoins, formatDate, formatNumber } from "@/lib/utils";
+import { formatAC, formatDate, formatNumber } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { SetupNotice } from "@/components/dashboard/setup-notice";
 import { ReferralLink } from "@/components/dashboard/referral-link";
@@ -110,7 +110,7 @@ export default async function ReferralsPage() {
             <>
               <p>
                 When someone joins using your link and their signup is credited, you earn{" "}
-                <span className="font-semibold text-coin">{formatCoins(config.amount)}</span>.{" "}
+                <span className="font-semibold text-coin">{formatAC(config.amount)}</span>.{" "}
                 {config.description}
               </p>
               <ul className="list-inside list-disc space-y-1">
