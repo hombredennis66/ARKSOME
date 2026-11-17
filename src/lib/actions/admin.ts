@@ -13,7 +13,7 @@ import type {
   QuizQuestion,
   UserRole,
 } from "@/lib/database.types";
-import { formatCoins, slugify } from "@/lib/utils";
+import { formatAC, slugify } from "@/lib/utils";
 
 /** Result contract shared by every admin server action. */
 export type AdminActionResult = { ok: boolean; error?: string; message?: string };
@@ -87,7 +87,6 @@ const SERVICE_KEY_MISSING =
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const KEY_RE = /^[a-z0-9][a-z0-9_-]{1,59}$/;
 const MAX_COINS = 1_000_000;
-const MAX_WALLET_ADJUSTMENT_CENTS = 1_000_000;
 
 function fail(error: string): AdminActionResult {
   return { ok: false, error };
@@ -195,21 +194,19 @@ export async function adminAdjustBalance(
   amount: number,
   reason: string,
 ): Promise<AdminActionResult> {
-  await requireAdmin();
-  if (!isUuid(userId)) return fail("Invalid user id.");
-  if (!Number.isFinite(amount)) {
-    return fail("Enter a valid USD amount.");
-  }
+ await requireAdmin();
+ if (!isUuid(userId)) return fail("Invalid user id.");
+ if (!Number.isSafeInteger(amount)) {
+   return fail("Enter a valid whole-number AC amount.");
+ }
 
-  const amountCents = Math.round(amount * 100);
+ const amountAC = amount;
 
-  if (
-    Math.abs(amount * 100 - amountCents) > 0.000001 ||
-    amountCents === 0 ||
-    Math.abs(amountCents) > MAX_WALLET_ADJUSTMENT_CENTS
-  ) {
-    return fail("Enter a non-zero amount with up to 2 decimal places, within ±$10,000.00.");
-  }
+ if (amountAC === 0 || Math.abs(amountAC) > MAX_COINS) {
+   return fail(
+     `Enter a non-zero whole-number AC amount within ±${MAX_COINS.toLocaleString()}.`,
+   );
+ }
   const trimmedReason = (reason ?? "").trim();
   if (trimmedReason.length < 3 || trimmedReason.length > 200) {
     return fail("A reason of 3–200 characters is required for the audit trail.");
@@ -220,7 +217,7 @@ export async function adminAdjustBalance(
 
   const { data, error } = await supabase.rpc("admin_adjust_balance", {
     p_user_id: userId,
-    p_amount: amountCents,
+    p_amount: amountAC,
     p_reason: trimmedReason,
   });
   if (error) return fail(error.message);
@@ -229,16 +226,16 @@ export async function adminAdjustBalance(
   if (!payload?.ok) return fail(payload?.error ?? "Adjustment failed.");
 
   await logAdminAction(supabase, "balance_adjust", "user", userId, {
-    amount: amountCents,
+    amount: amountAC,
     reason: trimmedReason,
     balance: payload.balance ?? 0,
     actor_note: "logged from admin console",
   });
   revalidatePath("/admin/users");
   revalidatePath("/admin");
-  const direction = amountCents > 0 ? "credited" : "debited";
+  const direction = amountAC > 0 ? "credited" : "debited";
   return ok(
-    `Account ${direction} ${formatCoins(Math.abs(amountCents))}. New balance: ${formatCoins(payload.balance ?? 0)}.`,
+    `Account ${direction} ${formatAC(Math.abs(amountAC))}. New balance: ${formatAC(payload.balance ?? 0)}.`,
   );
 }
 

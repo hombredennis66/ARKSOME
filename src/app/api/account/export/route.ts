@@ -12,12 +12,19 @@ export async function GET() {
   const user = authData.user;
   if (authError || !user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
-  const [profile, settings, consents, wallet, transactions, rewardEvents, bookmarks, quizAttempts, checkins, referrals, notifications, reports] = await Promise.all([
+  const [
+    profile, settings, consents, wallet, transactions,
+    acWallet, acTransactions,
+    rewardEvents, bookmarks, quizAttempts, checkins,
+    referrals, notifications, reports,
+  ] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
     supabase.from("user_settings").select("*").eq("user_id", user.id).maybeSingle(),
     supabase.from("consents").select("*").eq("user_id", user.id),
     supabase.from("wallets").select("*").eq("user_id", user.id).maybeSingle(),
     supabase.from("coin_transactions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+    supabase.from("ac_wallets").select("*").eq("user_id", user.id).maybeSingle(),
+    supabase.from("ac_transactions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
     supabase.from("reward_events").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
     supabase.from("bookmarks").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
     supabase.from("quiz_attempts").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
@@ -40,6 +47,8 @@ export async function GET() {
     consents: consents.data ?? [],
     wallet: wallet.data,
     coin_transactions: transactions.data ?? [],
+    ac_wallet: acWallet.data,
+    ac_transactions: acTransactions.data ?? [],
     reward_events: rewardEvents.data ?? [],
     bookmarks: bookmarks.data ?? [],
     quiz_attempts: quizAttempts.data ?? [],

@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { ChevronLeft, ChevronRight, Loader2, Trophy } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { submitQuiz } from "@/lib/actions/rewards";
-import { formatAC, formatCoins } from "@/lib/utils";
+import { formatAC } from "@/lib/utils";
 import { parseQuizQuestions, type QuizQuestion } from "@/lib/database.types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -195,7 +195,7 @@ export function QuizPlayer({
         </p>
         {typeof result.balance === "number" && (
           <p className="mt-1 text-sm text-muted-foreground">
-            Balance: <span className="font-medium text-coin">{formatCoins(result.balance)}</span>
+            Balance: <span className="font-medium text-coin">{formatAC(result.balance)}</span>
           </p>
         )}
         <div className="mt-3 flex flex-wrap gap-2">
