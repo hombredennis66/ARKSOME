@@ -139,7 +139,7 @@ export async function resetPassword(
   if (!supabase) return { error: "Authentication is unavailable right now." };
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/settings`,
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/callback?next=/reset-password`,
   });
 
   // Never reveal whether an address exists.
@@ -152,4 +152,36 @@ export async function signOut(): Promise<void> {
   const supabase = await createClient();
   if (supabase) await supabase.auth.signOut();
   redirect("/");
+}
+
+export async function updateRecoveredPassword(
+  _prev: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const password = String(formData.get("password") ?? "");
+  const confirmation = String(formData.get("confirm_password") ?? "");
+
+  if (password.length < 8) {
+    return { error: "Password must be at least 8 characters." };
+  }
+
+  if (password !== confirmation) {
+    return { error: "Both passwords must match." };
+  }
+
+  const supabase = await createClient();
+
+  if (!supabase) {
+    return { error: "Authentication is unavailable right now." };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return {
+    message: "Your password has been updated successfully.",
+  };
 }
