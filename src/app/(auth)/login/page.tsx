@@ -2,7 +2,11 @@
 
 import { use, useActionState } from "react";
 import Link from "next/link";
-import { signIn, type AuthFormState } from "@/app/(auth)/actions";
+import {
+  signIn,
+  signInWithGoogle,
+  type AuthFormState,
+} from "@/app/(auth)/actions";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -65,6 +69,14 @@ export default function LoginPage({
 
           <Button type="submit" className="w-full" disabled={pending}>
             {pending ? "Signing in…" : "Sign in"}
+          </Button>
+        </form>
+
+        <form action={signInWithGoogle} className="mt-4">
+          {next ? <input type="hidden" name="next" value={next} /> : null}
+
+          <Button type="submit" variant="outline" className="w-full">
+            Continue with Google
           </Button>
         </form>
 

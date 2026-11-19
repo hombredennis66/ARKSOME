@@ -185,3 +185,39 @@ export async function updateRecoveredPassword(
     message: "Your password has been updated successfully.",
   };
 }
+
+export async function signInWithGoogle(formData: FormData): Promise<void> {
+  const ip = await clientIp();
+  const blocked = await guardAuthRateLimit(ip, "google_signin");
+
+  if (blocked) {
+    redirect("/login?error=rate_limited");
+  }
+
+  if (!isSupabaseConfigured) {
+    redirect("/login?error=supabase_not_configured");
+  }
+
+  const supabase = await createClient();
+
+  if (!supabase) {
+    redirect("/login?error=auth_unavailable");
+  }
+
+  const next = safeNext(formData.get("next"));
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(next)}`,
+    },
+  });
+
+  if (error || !data.url) {
+    redirect("/login?error=google_oauth_failed");
+  }
+
+  redirect(data.url);
+}
