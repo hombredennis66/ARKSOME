@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { getServiceClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { UserRole } from "@/lib/database.types";
-import { formatDate, formatCoins } from "@/lib/utils";
+import { formatDate, formatAC } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -134,7 +134,7 @@ export default async function AdminUsersPage({
     // service-role client.
     const balances = new Map<string, number>();
     if (service && ids.length) {
-      const { data: walletRows } = await service.from("wallets").select("user_id, balance").in("user_id", ids);
+      const { data: walletRows } = await service.from("ac_wallets").select("user_id, balance").in("user_id", ids);
       for (const wallet of walletRows ?? []) balances.set(wallet.user_id, wallet.balance);
     }
 
@@ -250,7 +250,7 @@ export default async function AdminUsersPage({
                         {row.balance === null ? (
                           <span className="font-normal text-muted-foreground">unavailable</span>
                         ) : (
-                          formatCoins(row.balance)
+                          formatAC(row.balance)
                         )}
                       </td>
                       <td className="px-4 py-3">
