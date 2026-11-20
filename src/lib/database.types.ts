@@ -14,6 +14,18 @@ export type Database = {
   }
   public: {
     Tables: {
+      tasks: {
+        Row: { id: string; title: string; description: string; instructions: string; reward_amount: number; status: string; starts_at: string | null; deadline: string | null; created_by: string; created_at: string; updated_at: string }
+        Insert: { id?: string; title: string; description?: string; instructions?: string; reward_amount?: number; status?: string; starts_at?: string | null; deadline?: string | null; created_by: string; created_at?: string; updated_at?: string }
+        Update: { id?: string; title?: string; description?: string; instructions?: string; reward_amount?: number; status?: string; starts_at?: string | null; deadline?: string | null; created_by?: string; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
+      task_submissions: {
+        Row: { id: string; task_id: string; user_id: string; status: string; submitted_at: string; reviewed_at: string | null; reviewed_by: string | null; review_note: string | null; reward_amount_snapshot: number }
+        Insert: { id?: string; task_id: string; user_id: string; status?: string; submitted_at?: string; reviewed_at?: string | null; reviewed_by?: string | null; review_note?: string | null; reward_amount_snapshot: number }
+        Update: { id?: string; task_id?: string; user_id?: string; status?: string; submitted_at?: string; reviewed_at?: string | null; reviewed_by?: string | null; review_note?: string | null; reward_amount_snapshot?: number }
+        Relationships: []
+      }
       activities: {
         Row: {
           activity_type: string
@@ -796,6 +808,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      is_task_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
+      submit_task_completion: { Args: { p_task_id: string }; Returns: Json }
+      review_task_completion: { Args: { p_submission_id: string; p_decision: string; p_review_note?: string | null }; Returns: Json }
       admin_adjust_balance: {
         Args: { p_amount: number; p_reason: string; p_user_id: string }
         Returns: Json
@@ -986,6 +1001,8 @@ export type CoinTransaction =
   Database["public"]["Tables"]["coin_transactions"]["Row"];
 
 export type Activity = Tables<"activities">;
+export type Task = Tables<"tasks">;
+export type TaskSubmission = Tables<"task_submissions">;
 export type AdPlacement = Tables<"ad_placements">;
 export type AuditLog = Tables<"audit_logs">;
 export type Campaign = Tables<"campaigns">;

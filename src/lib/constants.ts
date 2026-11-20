@@ -19,6 +19,7 @@ export const publicNav = [
 export const authedNav = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/activities", label: "Activities" },
+  { href: "/tasks", label: "Tasks" },
   { href: "/wallet", label: "Wallet" },
   { href: "/bookmarks", label: "Saved" },
   { href: "/referrals", label: "Referrals" },
@@ -33,6 +34,7 @@ export const adminNav = [
   { href: "/admin/ads", label: "Ads & campaigns" },
   { href: "/admin/rewards", label: "Rewards" },
   { href: "/admin/activities", label: "Activities" },
+  { href: "/admin/tasks", label: "Tasks" },
   { href: "/admin/reports", label: "Reports" },
   { href: "/admin/audit-logs", label: "Audit logs" },
   { href: "/admin/settings", label: "Settings" },
