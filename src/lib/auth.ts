@@ -11,6 +11,7 @@ export type AuthedUser = {
   username: string | null;
   avatarUrl: string | null;
   balance: number;
+  acBalance: number;
   isBanned: boolean;
 };
 
@@ -28,10 +29,11 @@ export const getAuthedUser = cache(async (): Promise<AuthedUser | null> => {
 
   if (!user) return null;
 
-  const [profileRes, roleRes, walletRes] = await Promise.all([
+  const [profileRes, roleRes, walletRes, acWalletRes] = await Promise.all([
     supabase.from("profiles").select("display_name, username, avatar_url, is_banned").eq("id", user.id).maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", user.id),
     supabase.from("wallets").select("balance").eq("user_id", user.id).maybeSingle(),
+    supabase.from("ac_wallets").select("balance").eq("user_id", user.id).maybeSingle(),
   ]);
 
   // A user can temporarily have multiple role rows during an admin update.
@@ -49,6 +51,7 @@ export const getAuthedUser = cache(async (): Promise<AuthedUser | null> => {
     username: profileRes.data?.username ?? null,
     avatarUrl: profileRes.data?.avatar_url ?? null,
     balance: walletRes.data?.balance ?? 0,
+    acBalance: acWalletRes.data?.balance ?? 0,
     isBanned: profileRes.data?.is_banned ?? false,
   };
 });

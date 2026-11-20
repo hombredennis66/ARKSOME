@@ -116,7 +116,7 @@ export default async function DashboardPage() {
         <div className="flex flex-col justify-between rounded-2xl border border-border bg-card p-6">
           <div>
             <p className="text-sm font-medium text-muted-foreground">Current balance</p>
-            <p className="mt-2 text-4xl font-bold text-coin">{formatCoins(user.balance)}</p>
+            <p className="mt-2 text-4xl font-bold text-coin">{formatAC(user.acBalance)}</p>
           </div>
           <Link
             href="/wallet"

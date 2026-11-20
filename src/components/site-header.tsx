@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Coins, LayoutDashboard, LogOut } from "lucide-react";
 import { getAuthedUser } from "@/lib/auth";
 import { authedNav, publicNav, SITE_NAME } from "@/lib/constants";
-import { formatCoins } from "@/lib/utils";
+import { formatAC } from "@/lib/utils";
 import { signOut } from "@/app/(auth)/actions";
 import { NavLink } from "./nav-link";
 import { Button } from "./ui/button";
@@ -43,7 +43,7 @@ export async function SiteHeader() {
                 title="ARKSOME Coin balance"
               >
                 <Coins className="size-4 text-coin" aria-hidden />
-                {formatCoins(user.balance)}
+                {formatAC(user.acBalance)}
               </Link>
 
               {(user.role === "admin" || user.role === "super_admin" || user.role === "moderator") && (
@@ -99,7 +99,7 @@ export async function SiteHeader() {
         ))}
         {user ? (
           <span className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-full bg-coin/20 px-2 py-1 text-xs font-semibold">
-            <Coins className="size-3 text-coin" /> {formatCoins(user.balance)}
+            <Coins className="size-3 text-coin" /> {formatAC(user.acBalance)}
           </span>
         ) : null}
       </nav>

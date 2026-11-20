@@ -5,6 +5,7 @@ import { getAuthedUser } from "@/lib/auth";
 import { FeedList } from "@/components/feed/feed-list";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { COIN_DISCLAIMER, SITE_NAME, TAGLINE } from "@/lib/constants";
+import { formatAC } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -106,7 +107,7 @@ export default async function HomePage({
             <div className="rounded-xl border border-border bg-card p-5">
               <h2 className="text-sm font-semibold">Your balance</h2>
               <p className="mt-2 text-2xl font-bold text-coin">
-                {user ? `${user.balance.toLocaleString()} AC` : "— AC"}
+                {user ? formatAC(user.acBalance) : "— AC"}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {user ? "Earn more by completing activities." : "Sign in to see your balance."}
