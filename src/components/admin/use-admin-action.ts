@@ -20,7 +20,7 @@ export function useAdminAction() {
   const [feedback, setFeedback] = useState<FeedbackState>(null);
 
   const run = useCallback(
-    async (action: () => Promise<ActionResult>): Promise<ActionResult> => {
+    async <T extends ActionResult>(action: () => Promise<T>): Promise<T | ActionResult> => {
       setPending(true);
       setFeedback(null);
       try {

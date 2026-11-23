@@ -15,6 +15,12 @@ function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+function transactionSource(source: string) {
+  if (source === "usd_activity") return "Activity reward";
+  if (source === "admin_usd") return "Administrator adjustment";
+  return capitalize(source.replaceAll("_", " "));
+}
+
 export default async function WalletPage({
   searchParams,
 }: {
@@ -138,7 +144,7 @@ export default async function WalletPage({
                       </td>
                       <td className="px-4 py-3">{tx.reason}</td>
                       <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
-                        {capitalize(tx.source)}
+                        {transactionSource(tx.source)}
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant={tx.type === "credit" ? "success" : "destructive"}>

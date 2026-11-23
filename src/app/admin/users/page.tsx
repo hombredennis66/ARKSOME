@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { getServiceClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { UserRole } from "@/lib/database.types";
-import { formatDate, formatAC } from "@/lib/utils";
+import { formatDate, formatAC, formatCoins } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +33,8 @@ type UserListRow = {
   isBanned: boolean;
   createdAt: string;
   role: UserRole;
-  balance: number | null;
+  acBalance: number | null;
+  usdBalance: number | null;
 };
 
 /**
@@ -133,9 +134,12 @@ export default async function AdminUsersPage({
     // Wallets: RLS only exposes a user's own wallet, so admin reads need the
     // service-role client.
     const balances = new Map<string, number>();
+    const usdBalances = new Map<string, number>();
     if (service && ids.length) {
       const { data: walletRows } = await service.from("ac_wallets").select("user_id, balance").in("user_id", ids);
       for (const wallet of walletRows ?? []) balances.set(wallet.user_id, wallet.balance);
+      const { data: usdWalletRows } = await service.from("wallets").select("user_id, balance").in("user_id", ids);
+      for (const wallet of usdWalletRows ?? []) usdBalances.set(wallet.user_id, wallet.balance);
     }
 
     rows = profileRows.map((profile) => ({
@@ -146,7 +150,8 @@ export default async function AdminUsersPage({
       isBanned: profile.is_banned,
       createdAt: profile.created_at,
       role: roleByUser.get(profile.id) ?? "member",
-      balance: serviceReady ? (balances.get(profile.id) ?? 0) : null,
+      acBalance: serviceReady ? (balances.get(profile.id) ?? 0) : null,
+      usdBalance: serviceReady ? (usdBalances.get(profile.id) ?? 0) : null,
     }));
   }
 
@@ -157,7 +162,7 @@ export default async function AdminUsersPage({
           <h1 className="text-2xl font-bold tracking-tight">Users</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Search by username, display name or email prefix — then change roles, ban accounts or
-            adjust ARKSOME Coin (AC) balances. Every change is written to the audit log.
+            adjust ARKSOME Coin and simulated USD balances. Every change is written to the audit log.
           </p>
         </div>
         <form method="get" action="/admin/users" className="flex w-full max-w-md items-center gap-2">
@@ -227,7 +232,7 @@ export default async function AdminUsersPage({
                   <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground">
                     <th className="px-4 py-3 font-semibold">User</th>
                     <th className="px-4 py-3 font-semibold">Role</th>
-                    <th className="px-4 py-3 font-semibold">Balance</th>
+                    <th className="px-4 py-3 font-semibold">AC / simulated USD</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
                     <th className="px-4 py-3 font-semibold">Joined</th>
                     <th className="px-4 py-3 font-semibold">Actions</th>
@@ -246,11 +251,14 @@ export default async function AdminUsersPage({
                       <td className="px-4 py-3">
                         <Badge variant={ROLE_BADGE[row.role]}>{row.role.replace("_", " ")}</Badge>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-coin">
-                        {row.balance === null ? (
+                      <td className="px-4 py-3">
+                        {row.acBalance === null || row.usdBalance === null ? (
                           <span className="font-normal text-muted-foreground">unavailable</span>
                         ) : (
-                          formatAC(row.balance)
+                          <div className="space-y-1 text-xs">
+                            <div className="font-semibold text-coin">{formatAC(row.acBalance)} AC</div>
+                            <div className="font-medium text-muted-foreground">{formatCoins(row.usdBalance)} TEST USD</div>
+                          </div>
                         )}
                       </td>
                       <td className="px-4 py-3">

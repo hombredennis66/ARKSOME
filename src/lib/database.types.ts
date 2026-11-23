@@ -283,6 +283,8 @@ export type Database = {
           source: string
           type: Database["public"]["Enums"]["transaction_type"]
           user_id: string
+          usd_submission_id: string | null
+          usd_adjustment_request_id: string | null
         }
         Insert: {
           amount: number
@@ -294,6 +296,8 @@ export type Database = {
           source?: string
           type: Database["public"]["Enums"]["transaction_type"]
           user_id: string
+          usd_submission_id?: string | null
+          usd_adjustment_request_id?: string | null
         }
         Update: {
           amount?: number
@@ -305,6 +309,8 @@ export type Database = {
           source?: string
           type?: Database["public"]["Enums"]["transaction_type"]
           user_id?: string
+          usd_submission_id?: string | null
+          usd_adjustment_request_id?: string | null
         }
         Relationships: [
           {
@@ -313,6 +319,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "reward_events"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coin_transactions_usd_submission_id_fkey"
+            columns: ["usd_submission_id"]
+            isOneToOne: true
+            referencedRelation: "usd_reward_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coin_transactions_usd_adjustment_request_id_fkey"
+            columns: ["usd_adjustment_request_id"]
+            isOneToOne: true
+            referencedRelation: "usd_admin_adjustments"
+            referencedColumns: ["request_id"]
           },
         ]
       }
@@ -803,12 +823,46 @@ export type Database = {
         }
         Relationships: []
       }
+      account_records: {
+        Row: { id: string; created_at: string; deleted_at: string | null }
+        Insert: { id: string; created_at?: string; deleted_at?: string | null }
+        Update: { id?: string; created_at?: string; deleted_at?: string | null }
+        Relationships: []
+      }
+      usd_reward_configs: {
+        Row: { id: string; key: string; category: string; label: string; amount_cents: number; daily_limit: number | null; per_user_limit: number | null; enabled: boolean; created_by: string | null; updated_by: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; key: string; category: string; label: string; amount_cents: number; daily_limit?: number | null; per_user_limit?: number | null; enabled?: boolean; created_by?: string | null; updated_by?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; key?: string; category?: string; label?: string; amount_cents?: number; daily_limit?: number | null; per_user_limit?: number | null; enabled?: boolean; created_by?: string | null; updated_by?: string | null; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
+      usd_reward_submissions: {
+        Row: { id: string; config_id: string; user_id: string; details: string; activity_reference: string; reward_cents: number; status: string; reviewed_by: string | null; reviewed_at: string | null; review_note: string | null; created_at: string }
+        Insert: { id?: string; config_id: string; user_id: string; details: string; activity_reference: string; reward_cents: number; status?: string; reviewed_by?: string | null; reviewed_at?: string | null; review_note?: string | null; created_at?: string }
+        Update: { id?: string; config_id?: string; user_id?: string; details?: string; activity_reference?: string; reward_cents?: number; status?: string; reviewed_by?: string | null; reviewed_at?: string | null; review_note?: string | null; created_at?: string }
+        Relationships: []
+      }
+      usd_admin_adjustments: {
+        Row: { request_id: string; user_id: string; amount_cents: number; reason: string; balance_after: number; created_by: string | null; created_at: string }
+        Insert: { request_id: string; user_id: string; amount_cents: number; reason: string; balance_after: number; created_by?: string | null; created_at?: string }
+        Update: { request_id?: string; user_id?: string; amount_cents?: number; reason?: string; balance_after?: number; created_by?: string | null; created_at?: string }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       is_task_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
+      submit_usd_activity: {
+        Args: {
+          p_config_id: string;
+          p_details: string;
+          p_activity_reference: string;
+        };
+        Returns: Json;
+      }
+      review_usd_activity: { Args: { p_submission_id: string; p_decision: string; p_review_note?: string | null }; Returns: Json }
+      admin_adjust_usd_balance: { Args: { p_user_id: string; p_amount_cents: number; p_reason: string; p_request_id: string }; Returns: Json }
       submit_task_completion: { Args: { p_task_id: string }; Returns: Json }
       review_task_completion: { Args: { p_submission_id: string; p_decision: string; p_review_note?: string | null }; Returns: Json }
       admin_adjust_balance: {
